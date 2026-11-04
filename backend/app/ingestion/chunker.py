@@ -71,6 +71,14 @@ def chunk_text(
             current_page = page
             current_location = location
 
+        # If page number changes, flush previous page content to preserve strict page citations
+        if current_text and page is not None and current_page is not None and page != current_page:
+            chunks.append(flush(current_text, current_page, current_location, len(chunks)))
+            current_text = para
+            current_page = page
+            current_location = location
+            continue
+
         # Try adding this paragraph
         separator = "\n\n" if current_text else ""
         candidate = current_text + separator + para

@@ -197,10 +197,10 @@ export default function TerminologyPage() {
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-rose-800 line-through">"{m.matched_text}"</span>
+                      <span className="font-bold text-rose-800 line-through">&ldquo;{m.matched_text}&rdquo;</span>
                       <ArrowRight className="w-3 h-3 text-slate-400" />
                       <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
-                        "{m.preferred_term}"
+                        &ldquo;{m.preferred_term}&rdquo;
                       </span>
                       {getSeverityBadge(m.severity)}
                     </div>

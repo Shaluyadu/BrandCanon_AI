@@ -239,7 +239,7 @@ export default function ApprovedFactsPage() {
                   {fact.evidence_quote && (
                     <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2 text-xs text-slate-600 italic">
                       <Quote className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                      <span>"{fact.evidence_quote}"</span>
+                      <span>&ldquo;{fact.evidence_quote}&rdquo;</span>
                     </div>
                   )}
 
