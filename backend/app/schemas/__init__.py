@@ -10,6 +10,25 @@ from app.schemas.organisation import (
 )
 from app.schemas.member import MemberInvite, MemberRoleUpdate, MemberOut
 from app.schemas.audit import AuditLogOut
+from app.schemas.brand_knowledge import (
+    BrandProfileCreate,
+    BrandProfileUpdate,
+    BrandProfileOut,
+    DocumentOut,
+    DocumentDetailOut,
+    DocumentVersionOut,
+    ChunkOut,
+    DocumentContentOut,
+    ApprovedFactCreate,
+    ApprovedFactUpdate,
+    ApprovedFactOut,
+    TerminologyRuleCreate,
+    TerminologyRuleUpdate,
+    TerminologyRuleOut,
+    ApprovalDecisionRequest,
+    KnowledgeApprovalOut,
+    KnowledgeOverviewStats,
+)
 
 __all__ = [
     "APIResponse",
@@ -31,5 +50,22 @@ __all__ = [
     "MemberRoleUpdate",
     "MemberOut",
     "AuditLogOut",
+    "BrandProfileCreate",
+    "BrandProfileUpdate",
+    "BrandProfileOut",
+    "DocumentOut",
+    "DocumentDetailOut",
+    "DocumentVersionOut",
+    "ChunkOut",
+    "DocumentContentOut",
+    "ApprovedFactCreate",
+    "ApprovedFactUpdate",
+    "ApprovedFactOut",
+    "TerminologyRuleCreate",
+    "TerminologyRuleUpdate",
+    "TerminologyRuleOut",
+    "ApprovalDecisionRequest",
+    "KnowledgeApprovalOut",
+    "KnowledgeOverviewStats",
 ]
 

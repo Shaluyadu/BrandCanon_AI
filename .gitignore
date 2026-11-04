@@ -23,6 +23,9 @@ wheels/
 .pytest_cache/
 *.db
 brandcanon.db
+private_storage/
+backend/private_storage/
+*.tsbuildinfo
 
 # Node & Next.js
 node_modules/
