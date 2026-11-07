@@ -1,4 +1,7 @@
 import { APIResponse, AuthResponseData, MeResponseData, OrganisationDetail, OrganisationSettings } from "@/types/auth";
+import { DashboardStats, SubmissionsResponse } from "@/types/governance";
+import { SubmissionDetail, CreateSubmissionInput, EvidenceDetail } from "@/types/submission";
+import { AnalyticsOverview } from "@/types/analytics";
 import { Member, PaginatedResult } from "@/types/member";
 import { AuditLog } from "@/types/audit";
 import {
@@ -178,7 +181,61 @@ class ApiClient {
     },
   };
 
-  // --- Phase 2: Brand Knowledge Hub APIs ---
+
+
+  // --- Governance APIs ---
+  public governance = {
+    getDashboard: () => this.request<DashboardStats>("/governance/dashboard", { method: "GET" }),
+    getSubmissions: (params: {
+      page?: number;
+      pageSize?: number;
+      search?: string;
+      status?: string;
+      channel?: string;
+      author?: string;
+      startDate?: string;
+      endDate?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    } = {}) => {
+      const q = new URLSearchParams();
+      if (params.page) q.append("page", params.page.toString());
+      if (params.pageSize) q.append("page_size", params.pageSize.toString());
+      if (params.search) q.append("search", params.search);
+      if (params.status) q.append("status", params.status);
+      if (params.channel) q.append("channel", params.channel);
+      if (params.author) q.append("author", params.author);
+      if (params.startDate) q.append("start_date", params.startDate);
+      if (params.endDate) q.append("end_date", params.endDate);
+      if (params.sortBy) q.append("sort_by", params.sortBy);
+      if (params.sortOrder) q.append("sort_order", params.sortOrder);
+      return this.request<SubmissionsResponse>(`/governance/submissions?${q.toString()}`, { method: "GET" });
+    },
+    getSubmission: (id: string) => this.request<SubmissionDetail>(`/governance/submissions/${id}`, { method: "GET" }),
+    createSubmission: (payload: CreateSubmissionInput) =>
+      this.request<SubmissionDetail>("/governance/submissions", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    decideSubmission: (id: string, payload: { decision: string; notes?: string }) =>
+      this.request<SubmissionDetail>(`/governance/submissions/${id}/decide`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    handleSuggestionAction: (suggestionId: string, action: "APPLY" | "REJECT") =>
+      this.request<{ suggestion_id: string; status: string }>(`/governance/suggestions/${suggestionId}/action`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      }),
+    getEvidence: (evidenceId: string) =>
+      this.request<EvidenceDetail>(`/governance/evidence/${evidenceId}`, { method: "GET" }),
+  };
+
+  // --- Analytics APIs ---
+  public analytics = {
+    getOverview: () => this.request<AnalyticsOverview>("/analytics/overview", { method: "GET" }),
+  };
+
   public brand = {
     getOverview: () => this.request<KnowledgeOverviewStats>("/brand/overview", { method: "GET" }),
 

@@ -1,9 +1,5 @@
-'''BrandCanon AI — Phase 4 Review Engine models.
-
-Defines persistent tables for review results, findings, evidence, suggestions, and optional component executions.
-''' 
-
 import enum
+from .content_submission import ReviewJob, ReviewJobStatus
 from sqlalchemy import (
     Column,
     String,
@@ -49,7 +45,7 @@ class ReviewResult(Base, TimestampMixin):
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
-    review_job = relationship("ReviewJob", back_populates="review_result")
+    review_job = relationship("ReviewJob")
     submission = relationship("ContentSubmission")
     content_version = relationship("ContentVersion")
     findings = relationship(
@@ -187,4 +183,3 @@ class ReviewComponentExecution(Base, TimestampMixin):
     __table_args__ = (
         Index("ix_component_exec_org_result", "organisation_id", "review_result_id"),
     )
-

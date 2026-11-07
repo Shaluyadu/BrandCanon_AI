@@ -9,7 +9,9 @@ from app.api.v1 import (
     brand_documents,
     brand_facts,
     brand_terminology,
-    brand_approvals
+    brand_approvals,
+    governance,
+    analytics,
 )
 
 api_router = APIRouter()
@@ -27,4 +29,8 @@ api_router.include_router(brand_facts.router, prefix="/brand", tags=["Brand Fact
 api_router.include_router(brand_terminology.router, prefix="/brand", tags=["Brand Terminology"])
 api_router.include_router(brand_approvals.router, prefix="/brand", tags=["Brand Knowledge Approvals"])
 
+# Phase 5 — Governance & Review
+api_router.include_router(governance.router, prefix="/governance", tags=["Governance Dashboard & Submissions"])
 
+# Phase 6 — Analytics & Hardening
+api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics & Insights"])
