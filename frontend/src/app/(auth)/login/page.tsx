@@ -41,6 +41,10 @@ export default function LoginPage() {
     setErrorMessage(null);
   };
 
+  const showDemoAccounts =
+    process.env.NODE_ENV !== "production" ||
+    process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGINS === "true";
+
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -103,47 +107,49 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Fictional Demo Accounts Quick Fill */}
-          <div className="mt-6 pt-6 border-t border-slate-100">
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-              NovaTech Demo Workspace Logins
+          {/* Fictional Demo Accounts Quick Fill (Only visible in Development / Demo mode) */}
+          {showDemoAccounts && (
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-brand-600" />
+                NovaTech Demo Workspace Logins
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => fillDemoAccount("admin@novatech.io")}
+                  className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
+                >
+                  <div className="font-semibold text-slate-900 text-[11px]">Workspace Admin</div>
+                  <div className="text-[10px] text-slate-500 truncate">admin@novatech.io</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemoAccount("brand@novatech.io")}
+                  className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
+                >
+                  <div className="font-semibold text-slate-900 text-[11px]">Brand Manager</div>
+                  <div className="text-[10px] text-slate-500 truncate">brand@novatech.io</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemoAccount("creator@novatech.io")}
+                  className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
+                >
+                  <div className="font-semibold text-slate-900 text-[11px]">Content Creator</div>
+                  <div className="text-[10px] text-slate-500 truncate">creator@novatech.io</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemoAccount("reviewer@novatech.io")}
+                  className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
+                >
+                  <div className="font-semibold text-slate-900 text-[11px]">Reviewer / Legal</div>
+                  <div className="text-[10px] text-slate-500 truncate">reviewer@novatech.io</div>
+                </button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("admin@novatech.io")}
-                className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
-              >
-                <div className="font-semibold text-slate-900 text-[11px]">Workspace Admin</div>
-                <div className="text-[10px] text-slate-500 truncate">admin@novatech.io</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("brand@novatech.io")}
-                className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
-              >
-                <div className="font-semibold text-slate-900 text-[11px]">Brand Manager</div>
-                <div className="text-[10px] text-slate-500 truncate">brand@novatech.io</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("creator@novatech.io")}
-                className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
-              >
-                <div className="font-semibold text-slate-900 text-[11px]">Content Creator</div>
-                <div className="text-[10px] text-slate-500 truncate">creator@novatech.io</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("reviewer@novatech.io")}
-                className="p-2 text-left rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-50/70 hover:border-brand-300 transition-all text-slate-700"
-              >
-                <div className="font-semibold text-slate-900 text-[11px]">Reviewer / Legal</div>
-                <div className="text-[10px] text-slate-500 truncate">reviewer@novatech.io</div>
-              </button>
-            </div>
-          </div>
+          )}
 
           <div className="mt-6 text-center text-xs text-slate-500">
             Need an organization workspace?{" "}

@@ -16,7 +16,17 @@ class InMemoryRateLimiter:
         self.requests: Dict[str, List[float]] = defaultdict(list)
 
     def check(self, request: Request, key_prefix: str = "auth"):
-        client_ip = request.client.host if request.client else "unknown"
+        client_ip = "unknown"
+        # Extract real client IP if behind reverse proxy / load balancer
+        forwarded_for = request.headers.get("x-forwarded-for")
+        real_ip = request.headers.get("x-real-ip")
+        if forwarded_for:
+            client_ip = forwarded_for.split(",")[0].strip()
+        elif real_ip:
+            client_ip = real_ip.strip()
+        elif request.client:
+            client_ip = request.client.host
+
         key = f"{key_prefix}:{client_ip}"
         now = time.time()
         window_start = now - self.window_seconds
