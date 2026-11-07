@@ -38,7 +38,7 @@ Enforces a 4-tier enterprise role matrix across backend API dependencies and fro
 - Clean, light-first enterprise design with restrained orange identity accent (`#EA580C`), dark navy typography (`#0F172A`), and clear status indicators.
 - **Role-aware collapsible navigation**: Dynamically surfaces permitted tools per role.
 - **Dynamic Quick-Login selector**: Pre-configured for NovaTech demonstration personas.
-- **Production Docker Compose & Vercel**: Ready for full-stack Docker deployment and Vercel Next.js hosting.
+- **Production Docker Compose & Render**: Ready for full-stack Docker deployment and Render Blueprint hosting.
 
 ---
 
@@ -117,6 +117,19 @@ npm run typecheck
 
 ---
 
+## ☁️ Render Blueprint Deployment
+
+Deploy both Frontend and Backend seamlessly on Render via the included `render.yaml` blueprint:
+
+1. Sign in to [Render.com](https://render.com) and go to **Blueprints**.
+2. Click **New Blueprint Instance** and connect this repository (`BrandCanon_AI`).
+3. Render automatically provisions:
+   - **`brandcanon-backend`**: FastAPI Web Service with Python 3.11, automatic database migrations, and seed data.
+   - **`brandcanon-frontend`**: Next.js 14 Web Service connected to the backend.
+4. Click **Apply** to deploy both services with one click.
+
+---
+
 ## 🚢 Docker Compose Production Setup
 
 To run the complete production stack (PostgreSQL + pgvector, Redis, FastAPI Backend, and Next.js Frontend):
@@ -137,6 +150,6 @@ docker compose up --build
 | **Phase 4: Agentic AI Review** | ✅ Complete | Review orchestrator, deterministic terminology matcher, pgvector/mock embeddings RAG, and evidence grounding layer. |
 | **Phase 5: Governance & Approvals** | ✅ Complete | Split-screen Review Studio, creator revision workflows, reviewer decision queues, and audit trail generation. |
 | **Phase 6: Governance Analytics** | ✅ Complete | Empirical compliance metrics, recurring violation pattern heatmaps, team benchmarks, and performance dashboards. |
-| **Phase 7: Deployment & Hardening** | ✅ Complete | Production Docker Compose (Postgres, pgvector, Redis), Vercel Next.js configuration, TLS/security hardening, and 62 passing tests. |
+| **Phase 7: Deployment & Hardening** | ✅ Complete | Production Docker Compose (Postgres, pgvector, Redis), Render Blueprint deployment, TLS/security hardening, and 62 passing tests. |
 
 # BrandCanon_AI
