@@ -30,6 +30,7 @@ backend/private_storage/
 # Node & Next.js
 node_modules/
 .next/
+.vercel/
 out/
 build/
 .DS_Store
