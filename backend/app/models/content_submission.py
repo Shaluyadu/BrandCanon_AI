@@ -130,4 +130,3 @@ class ReviewJob(Base, TimestampMixin):
         Index("ix_review_jobs_org_status", "organisation_id", "job_status"),
         Index("ix_review_jobs_sub_ver", "submission_id", "content_version_id"),
     )
-

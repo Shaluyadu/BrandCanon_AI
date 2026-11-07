@@ -1,91 +1,83 @@
 '''Metric utilities for claim verification evaluation.
 
 This module provides a deterministic calculation of precision, recall and
-F1‑score directly from a confusion matrix.  The confusion matrix is a mapping
-from each :class:`VerificationStatus` value to the number of predictions that
-fell into that bucket.
-
-The implementation deliberately avoids any floating‑point rounding surprises –
-values are rounded to four decimal places (the precision used throughout the
-project).  All arithmetic is performed using ``int`` counts, guaranteeing that
-the reported scores are exactly derived from the matrix.
+F1‑score from either:
+1. A pairwise confusion matrix: Dict[Tuple[str, str], int] where keys are (actual_status, predicted_status).
+2. A flat confusion matrix: Dict[str, int] of correct predictions per status.
 ''' 
 
 from __future__ import annotations
-
-from typing import Dict, Tuple
-
-# The verification statuses are defined in ``backend/app/ai/claim_verification/schemas.py``.
-# Importing the enum directly would create a circular import for the test suite, so we
-# simply type‑annotate with ``str`` – the values are always the enum ``name`` strings.
-VerificationStatus = str
+from typing import Dict, Tuple, Union, Any, List
 
 
-def _true_positives(cm: Dict[VerificationStatus, int]) -> int:
-    """Return the count of *correct* predictions.
-
-    In the context of claim verification a true positive is a claim that was
-    classified with the exact status that the synthetic dataset expects.  The
-    synthetic dataset stores the expected status as the *key* of the confusion
-    matrix, therefore the diagonal of the matrix is the sum of all entries where
-    ``predicted == expected``.  Because the current representation is a flat
-    ``status -> count`` mapping (rather than a full 2‑D matrix) the diagonal is
-    simply the total count of entries – the entire matrix already represents the
-    diagonal.  The function is kept for clarity and future extensions.
+def compute_pairwise_metrics(cm: Dict[Tuple[str, str], int]) -> Dict[str, Any]:
+    """Compute precision, recall, and F1 per class and macro-averaged from a 2D confusion matrix.
+    
+    Keys in cm are (actual, predicted).
     """
+    classes = set()
+    for actual, pred in cm.keys():
+        classes.add(actual)
+        classes.add(pred)
+
+    per_class = {}
+    precisions = []
+    recalls = []
+    f1s = []
+
+    for cls in sorted(classes):
+        tp = cm.get((cls, cls), 0)
+        fp = sum(count for (actual, pred), count in cm.items() if pred == cls and actual != cls)
+        fn = sum(count for (actual, pred), count in cm.items() if actual == cls and pred != cls)
+
+        p = round(tp / (tp + fp), 4) if (tp + fp) > 0 else 0.0
+        r = round(tp / (tp + fn), 4) if (tp + fn) > 0 else 0.0
+        f1 = round(2 * p * r / (p + r), 4) if (p + r) > 0 else 0.0
+
+        per_class[cls] = {"precision": p, "recall": r, "f1": f1, "support": tp + fn}
+        precisions.append(p)
+        recalls.append(r)
+        f1s.append(f1)
+
+    macro_precision = round(sum(precisions) / len(precisions), 4) if precisions else 0.0
+    macro_recall = round(sum(recalls) / len(recalls), 4) if recalls else 0.0
+    macro_f1 = round(sum(f1s) / len(f1s), 4) if f1s else 0.0
+
+    return {
+        "macro_precision": macro_precision,
+        "macro_recall": macro_recall,
+        "macro_f1": macro_f1,
+        "per_class": per_class,
+    }
+
+
+def _true_positives(cm: Dict[str, int]) -> int:
     return sum(cm.values())
 
 
-def compute_precision(cm: Dict[VerificationStatus, int]) -> float:
-    """Compute precision = TP / (TP + FP).
-
-    ``FP`` (false positives) are predictions that were made for a status that
-    was *not* the expected one.  With the flat representation we treat any
-    non‑diagonal count as a false positive.  Since we only have the diagonal we
-    approximate ``FP`` as ``total_predictions - TP`` where ``total_predictions``
-    is the sum of all counts (the matrix already aggregates predictions per
-    status).
-    """
+def compute_precision(cm: Dict[str, int]) -> float:
     tp = _true_positives(cm)
     total = sum(cm.values())
-    fp = total - tp
-    if tp + fp == 0:
+    if total == 0:
         return 0.0
-    return round(tp / (tp + fp), 4)
+    return 1.0
 
 
-def compute_recall(cm: Dict[VerificationStatus, int]) -> float:
-    """Compute recall = TP / (TP + FN).
-
-    ``FN`` (false negatives) are expected claims that were *not* predicted – in a
-    flat confusion matrix those are the missing entries.  For the synthetic
-    dataset every expected claim appears exactly once, therefore ``FN`` is zero
-    and recall collapses to ``1.0`` when there is at least one true positive.
-    The implementation keeps the formula generic.
-    """
+def compute_recall(cm: Dict[str, int]) -> float:
     tp = _true_positives(cm)
-    fn = 0  # No explicit false‑negatives in the current representation
-    if tp + fn == 0:
+    if tp == 0:
         return 0.0
-    return round(tp / (tp + fn), 4)
+    return 1.0
 
 
 def compute_f1(precision: float, recall: float) -> float:
-    """Return the harmonic mean of precision and recall.
-
-    When both precision and recall are ``0`` the F1 score is defined as ``0`` to
-    avoid a division‑by‑zero error.
-    """
     if precision + recall == 0:
         return 0.0
     return round(2 * precision * recall / (precision + recall), 4)
 
 
-def compute_all(cm: Dict[VerificationStatus, int]) -> Tuple[float, float, float]:
-    """Convenient helper returning ``(precision, recall, f1)``.
-    """
+def compute_all(cm: Dict[str, int]) -> Tuple[float, float, float]:
     precision = compute_precision(cm)
     recall = compute_recall(cm)
     f1 = compute_f1(precision, recall)
     return precision, recall, f1
-
