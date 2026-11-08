@@ -21,6 +21,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy runtime dependencies from builder
+COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
 # Copy application code
@@ -30,5 +31,5 @@ COPY backend/ .
 EXPOSE 8000
 
 # Run migrations on container start (SQLite works out‑of‑the‑box)
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000
+CMD python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000
 
