@@ -1,69 +1,33 @@
+version: "3.9"
+
 services:
-  db:
-    image: pgvector/pgvector:pg16
-    container_name: brandcanon-db
-    restart: always
-    environment:
-      POSTGRES_DB: brandcanon_db
-      POSTGRES_USER: brandcanon
-      POSTGRES_PASSWORD: brandcanon_password
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U brandcanon -d brandcanon_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: brandcanon-redis
-    restart: always
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.backend
     container_name: brandcanon-backend
-    restart: always
     environment:
-      APP_ENV: production
-      DEBUG: "false"
-      DATABASE_URL: postgresql://brandcanon:brandcanon_password@db:5432/brandcanon_db
-      REDIS_URL: redis://redis:6379/0
-      JWT_SECRET: brandcanon_super_secret_jwt_key_enterprise_2026_change_in_prod
-      FRONTEND_URL: http://localhost:3000
-      BACKEND_URL: http://localhost:8000
+      DATABASE_URL: sqlite:///./brandcanon.db
+      JWT_SECRET: ${JWT_SECRET:-super-secret}
+      APP_ENV: development
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.frontend
     container_name: brandcanon-frontend
-    restart: always
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+      BACKEND_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://backend:8000/api/v1
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
-
-volumes:
-  pgdata:
-
